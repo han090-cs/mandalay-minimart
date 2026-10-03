@@ -3,21 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#1d6b61">
+  <meta name="theme-color" content="#D4A574">
   <meta name="description" content="Myanmar convenience store and minimart finder">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>Myanmar Minimart Finder</title>
   <style>
     :root {
-      --bg: #fafafa;
+      --bg: #fefdfb;
       --surface: #ffffff;
-      --text: #1a1a1a;
-      --text-muted: #666;
-      --border: #e5e5e5;
-      --accent: #1d6b61;
-      --accent-light: #e8f5f3;
-      --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
-      --shadow: 0 4px 12px rgba(0,0,0,.08);
+      --text: #2b2520;
+      --text-muted: #8b7d6f;
+      --border: #e8dcc8;
+      --accent: #D4A574;
+      --accent-light: #faf3e8;
+      --shadow-sm: 0 1px 2px rgba(43,37,32,.04);
+      --shadow: 0 4px 12px rgba(43,37,32,.08);
     }
 
     * { box-sizing: border-box; }
@@ -60,11 +60,12 @@
     .search-box input {
       flex: 1;
       padding: 12px 14px;
-      border: 1px solid var(--border);
+      border: 2px solid var(--border);
       border-radius: 8px;
       background: var(--surface);
       font-size: 1rem;
       outline: none;
+      transition: all 0.2s;
     }
     .search-box input:focus {
       border-color: var(--accent);
@@ -79,6 +80,12 @@
       font-weight: 700;
       cursor: pointer;
       font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .search-box button:hover {
+      background: #c9985f;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
     }
 
     /* Quick actions */
@@ -91,7 +98,7 @@
     .action-btn {
       padding: 10px 8px;
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 2px solid var(--border);
       border-radius: 8px;
       cursor: pointer;
       font-size: 0.85rem;
@@ -122,7 +129,7 @@
     .filter-chip {
       white-space: nowrap;
       padding: 8px 12px;
-      border: 1px solid var(--border);
+      border: 2px solid var(--border);
       border-radius: 20px;
       background: var(--surface);
       cursor: pointer;
@@ -132,6 +139,7 @@
     }
     .filter-chip:hover {
       border-color: var(--accent);
+      background: var(--accent-light);
     }
     .filter-chip.active {
       background: var(--accent);
@@ -146,7 +154,7 @@
       align-items: center;
       margin-bottom: 12px;
       padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 2px solid var(--border);
     }
     .result-count {
       font-weight: 600;
@@ -160,7 +168,7 @@
     }
     .card {
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 2px solid var(--border);
       border-radius: 12px;
       padding: 14px;
       box-shadow: var(--shadow-sm);
@@ -169,6 +177,7 @@
     .card:hover {
       box-shadow: var(--shadow);
       border-color: var(--accent);
+      background: var(--accent-light);
     }
 
     .card-header {
@@ -236,7 +245,7 @@
     .card-link {
       flex: 1;
       padding: 8px 10px;
-      border: 1px solid var(--border);
+      border: 2px solid var(--border);
       border-radius: 6px;
       background: var(--surface);
       text-decoration: none;
@@ -245,10 +254,12 @@
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
+      color: var(--text);
     }
     .card-link:hover {
       border-color: var(--accent);
-      background: var(--accent-light);
+      background: var(--accent);
+      color: white;
     }
 
     /* Empty state */
@@ -269,10 +280,10 @@
       width: min(90vw, 480px);
       padding: 24px;
       background: var(--surface);
-      box-shadow: 0 20px 60px rgba(0,0,0,.15);
+      box-shadow: 0 20px 60px rgba(43,37,32,.15);
     }
     dialog::backdrop {
-      background: rgba(0,0,0,.4);
+      background: rgba(43,37,32,.4);
     }
     .modal-header {
       display: flex;
@@ -283,6 +294,7 @@
     .modal-header h2 {
       margin: 0;
       font-size: 1.2rem;
+      color: var(--accent);
     }
     .close-btn {
       background: none;
@@ -305,10 +317,12 @@
     .form-group input,
     .form-group select {
       padding: 10px 12px;
-      border: 1px solid var(--border);
+      border: 2px solid var(--border);
       border-radius: 6px;
       font-size: 0.95rem;
       font-family: inherit;
+      background: var(--surface);
+      color: var(--text);
     }
     .form-group input:focus,
     .form-group select:focus {
@@ -331,16 +345,24 @@
       border-radius: 6px;
       font-weight: 700;
       cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary:hover {
+      background: #c9985f;
     }
     .btn-secondary {
       flex: 1;
       padding: 12px;
       background: var(--accent-light);
       color: var(--accent);
-      border: none;
+      border: 2px solid var(--border);
       border-radius: 6px;
       font-weight: 700;
       cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover {
+      border-color: var(--accent);
     }
 
     /* Toast */
@@ -362,13 +384,13 @@
     /* Dark mode */
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #0f0f0f;
-        --surface: #1a1a1a;
-        --text: #f5f5f5;
-        --text-muted: #999;
-        --border: #2a2a2a;
-        --accent: #2a9d8f;
-        --accent-light: rgba(42,157,143,0.1);
+        --bg: #1a1410;
+        --surface: #2a2420;
+        --text: #f0e8e0;
+        --text-muted: #a89880;
+        --border: #3d3530;
+        --accent: #E8B887;
+        --accent-light: rgba(232,184,135,.12);
       }
     }
 
@@ -432,7 +454,7 @@
       </div>
       <div class="form-group">
         <label>လိပ်စာ</label>
-        <input id="fAddr" type="text" placeholder="(84) လမ်း၊ (30x77)" required>
+        <input id="fAddr" type="text" placeholder="(84) ���မ်း၊ (30x77)" required>
       </div>
       <div class="form-group">
         <label>မြို့နယ် / ရှပ်</label>
