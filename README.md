@@ -1,6 +1,6 @@
-# Myanmar Minimart Finder
+# Mandalay Minimart Finder
 
-A mobile-first static web app for finding convenience stores and minimarts across Myanmar, with an emphasis on CoCo, G&G, Lar Lar, City Mart, Ocean, and other local minimart brands.
+Mobile-first static website for finding convenience stores and minimarts in Mandalay, with emphasis on CoCo, G&G, Lar Lar, City Mart, Ocean, Capital, and other local minimart brands.
 
 ## Live demo
 
@@ -19,7 +19,7 @@ http://localhost:8080
 ## Features
 
 - Mobile-friendly Myanmar UI
-- Search by shop name, address, township, phone number, city, or state
+- Search by shop name, address, township, phone number, or branch code
 - Brand filters for CoCo, G&G, Lar Lar, City Mart, Ocean, Capital, and minimart brands
 - Nearby shop lookup using browser GPS
 - Quick Google Maps links
@@ -32,9 +32,9 @@ http://localhost:8080
 
 ## Data note
 
-This project uses a working directory dataset stored in `shops.json`.
+This project uses a working directory dataset stored in `shops.json` for Mandalay only.
 
-It is intended for local discovery and demo use, and the dataset should be treated as an evolving directory rather than a fully exhaustive national registry. The app is designed to make it easy to update and expand over time as more verified information becomes available.
+It is intended for local discovery and demo use. The dataset should be treated as an evolving directory rather than a fully exhaustive registry. The app is designed to make it easy to update and expand store information over time.
 
 ## Project structure
 
@@ -49,17 +49,16 @@ It is intended for local discovery and demo use, and the dataset should be treat
 
 ## Data quality notes
 
-- Verified: linked to a reliable directory and/or cross-checked with public sources
-- Online-listed: appears in a Foodpanda or online branch listing but may need further verification
-- Directory-listed: present in a directory listing, but exact branch details may still need confirmation
+- Verified: address and phone supported by directory listings or other public references
+- Online-listed: listing exists online but exact branch details were not independently verified here
+- Directory-listed: public directory listing exists but branch identity may need further checking
 
-## Why this is useful
+## Share
 
-- Easy to browse on mobile devices
-- Helpful for people looking for nearby minimart branches
-- Good for a personal project, local community listing, or small-scale demo
-- Lightweight and easy to deploy on GitHub Pages, Netlify, or a simple static web host
+You can share this project with friends using the repository link:
 
-## License
+```text
+https://github.com/han090-cs/mandalay-minimart
+```
 
-This project is provided as-is for demo, local use, and community-focused development.
+For a live hosted version, deploy the folder to GitHub Pages or any static web host.
