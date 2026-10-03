@@ -524,6 +524,14 @@
       ['All', 'အားလုံး']
     ];
 
+    const CITY_ALIASES = {
+      Mandalay: ['mandalay', 'မန္တလေး'],
+      Yangon: ['yangon', 'ရန်ကုန်'],
+      Naypyidaw: ['naypyidaw', 'နေပြည်တော်'],
+      Bagan: ['bagan', 'ပုဂ္ဂလိက', 'ဗုဒ္ဓဂယာ'],
+      Taunggyi: ['taunggyi', 'တောင်ကြီး']
+    };
+
     const state = {
       shops: [],
       mine: [],
@@ -556,6 +564,13 @@
         .trim();
     }
 
+    function cityMatches(shop, cityName) {
+      if (cityName === 'All') return true;
+      const hay = [shop.city_mm, shop.township_mm, shop.state_mm, shop.address_mm].join(' ').toLowerCase();
+      const aliases = CITY_ALIASES[cityName] || [];
+      return aliases.some(v => hay.includes(String(v).toLowerCase()));
+    }
+
     function toast(msg) {
       const el = document.createElement('div');
       el.className = 'toast';
@@ -574,7 +589,8 @@
 
     function mapsUrl(shop) {
       if (shop.lat && shop.lng) return `https://www.google.com/maps/search/?api=1&query=${shop.lat},${shop.lng}`;
-      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.address_mm || shop.name || '')} ${shop.city_mm}`;
+      const cityHint = shop.city_mm || shop.township_mm || shop.state_mm || 'Mandalay';
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.address_mm || shop.name || '')} ${encodeURIComponent(cityHint)}`;
     }
 
     function save() {
@@ -588,7 +604,7 @@
         const hay = norm([s.brand_name, s.name, s.branch, s.address_mm, s.township_mm, s.phone].join(' '));
         return (state.brand === 'all' || s.brand_name === state.brand) &&
                (state.town === 'all' || s.township_mm === state.town) &&
-               (state.city === 'All' || s.city_mm === state.city) &&
+               cityMatches(s, state.city) &&
                (!state.favOnly || state.favs.has(s.id)) &&
                q.every(t => hay.includes(t));
       });
@@ -649,7 +665,7 @@
       $$('#brands [data-brand]').forEach(b => { b.onclick = () => { state.brand = b.dataset.brand; render(); }; });
 
       // Render town filters
-      const towns = [...new Set(state.shops.concat(state.mine).filter(s => state.city === 'All' || s.city_mm === state.city).map(s => s.township_mm).filter(Boolean))].sort();
+      const towns = [...new Set(state.shops.concat(state.mine).filter(s => cityMatches(s, state.city)).map(s => s.township_mm).filter(Boolean))].sort();
       $('#towns').innerHTML = [['all', 'မြို့နယ်အားလုံး'], ...towns.map(t => [t, t])]
         .map(([v, l]) => `<button class="filter-chip ${state.town === v ? 'active' : ''}" data-town="${v}">${esc(l)}</button>`).join('');
       $$('#towns [data-town]').forEach(b => { b.onclick = () => { state.town = b.dataset.town; render(); }; });
