@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="my">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#D4A574">
+  <meta name="description" content="Mandalay convenience store and minimart finder">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Mandalay Minimart Finder</title>
+  <style>
+    :root {
+      --bg: #fefbf7;
+      --surface: #ffffff;
+      --surface-2: #fffaf1;
+      --text: #2d241d;
+      --text-muted: #76685d;
+      --border: #eadbc2;
+      --accent: #d4a25d;
+      --accent-strong: #bf8740;
+      --accent-soft: #f9efe3;
+      --shadow-sm: 0 1px 2px rgba(45,36,29,.04);
+      --shadow: 0 10px 24px rgba(45,36,29,.08);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: linear-gradient(180deg, #fffdfb 0%, #fdf6ee 100%);
+      color: var(--text);
+      font-family: "Myanmar Text", "Noto Sans Myanmar", "Padauk", system-ui, sans-serif;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 18px 14px 56px;
+    }
+
+    header {
+      margin-bottom: 22px;
+    }
+    .logo {
+      font-size: 2.1rem;
+      font-weight: 900;
+      color: var(--accent-strong);
+      margin: 0 0 6px;
+      letter-spacing: -0.04em;
+    }
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .search-box input {
+      flex: 1;
+      padding: 13px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+    .search-box input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(212,162,93,0.12);
+    }
+    .search-box button {
+      padding: 13px 18px;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 0.9rem;
+      box-shadow: 0 10px 20px rgba(212,162,93,0.22);
+      transition: all 0.2s ease;
+    }
+    .search-box button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 22px rgba(212,162,93,0.28);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .action-btn {
+      padding: 11px 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-align: center;
+      transition: all 0.2s ease;
+      color: var(--text);
+      box-shadow: var(--shadow-sm);
+    }
+    .action-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      transform: translateY(-1px);
+    }
+    .action-btn.active {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 10px 18px rgba(212,162,93,0.2);
+    }
+
+    .filters-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+      scrollbar-width: none;
+    }
+    .filters-scroll::-webkit-scrollbar { display: none; }
+    .filter-chip {
+      white-space: nowrap;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      color: var(--text);
+    }
+    .filter-chip:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .filter-chip.active {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+      border-color: transparent;
+      color: white;
+      box-shadow: 0 8px 18px rgba(212,162,93,0.18);
+    }
+
+    #status {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+    .empty small {
+      display: inline-block;
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border);
+    }
+    .result-count {
+      font-weight: 800;
+      color: var(--accent-strong);
+    }
+
+    .cards {
+      display: grid;
+      gap: 14px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+    .card:hover {
+      box-shadow: var(--shadow);
+      border-color: rgba(212,162,93,0.55);
+      transform: translateY(-1px);
+      background: var(--surface-2);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .card-title {
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--text);
+    }
+    .card-badge {
+      font-size: 1.18rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      background: transparent;
+      color: #b8a388;
+    }
+    .card-badge.active {
+      color: #e7b658;
+      transform: scale(1.15);
+    }
+
+    .card-meta {
+      display: flex;
+      gap: 6px;
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .meta-tag {
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      padding: 4px 7px;
+      border-radius: 8px;
+      font-weight: 700;
+    }
+
+    .card-address {
+      font-size: 0.92rem;
+      color: var(--text);
+      margin-bottom: 8px;
+      line-height: 1.55;
+    }
+    .card-phone {
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    .card-phone a {
+      color: var(--accent-strong);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .card-distance {
+      font-size: 0.8rem;
+      color: var(--accent-strong);
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .card-link {
+      flex: 1;
+      padding: 9px 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      text-decoration: none;
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+    }
+    .card-link:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+    }
+
+    .empty {
+      text-align: center;
+      padding: 52px 16px 18px;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.4);
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+    }
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+
+    dialog {
+      border: none;
+      border-radius: 16px;
+      width: min(90vw, 500px);
+      padding: 22px;
+      background: var(--surface);
+      box-shadow: 0 22px 60px rgba(45,36,29,.14);
+    }
+    dialog::backdrop {
+      background: rgba(45,36,29,.4);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--accent-strong);
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    .form-group {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .form-group label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .form-group input,
+    .form-group select {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background: var(--surface);
+      color: var(--text);
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(212,162,93,0.12);
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .btn-primary {
+      flex: 1;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      flex: 1;
+      padding: 12px;
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-secondary:hover {
+      border-color: var(--accent);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(45,36,29,0.94);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      max-width: 85vw;
+      z-index: 50;
+      box-shadow: var(--shadow);
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 12px 12px 46px; }
+      .logo { font-size: 1.7rem; }
+      .search-box { flex-direction: column; }
+      .actions { grid-template-columns: 1fr 1fr; }
+      dialog { width: 95vw; padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">🏪 Mandalay Minimart</div>
+      <div class="subtitle">မန္တလေးမြို့အတွင်း Mini Market / Minimart ရှာဖွေပါ</div>
+    </header>
+
+    <div class="search-box">
+      <input id="search" type="search" placeholder="လမ်း / နံပါတ် / မြို့နယ် ရိုက်ပါ" aria-label="Search">
+      <button type="button" id="searchBtn">ရှာမည်</button>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="action-btn" id="locBtn">📍 အနီးဆုံး</button>
+      <button type="button" class="action-btn" id="favBtn">⭐ အကြိုက်ဆုံး</button>
+      <button type="button" class="action-btn" id="addBtn">➕ ထည့်သည်</button>
+    </div>
+
+    <div class="filters-scroll" id="brands"></div>
+    <div class="filters-scroll" id="towns"></div>
+
+    <div class="results-header">
+      <span class="result-count" id="count">ဒေတာဖတ်နေသည်…</span>
+      <span class="subtitle" id="status" aria-live="polite">Mandalay only</span>
+    </div>
+
+    <section class="cards" id="cards"></section>
+  </div>
+
+  <dialog id="modal">
+    <div class="modal-header">
+      <h2>ဆိုင်အသစ်ထည့်ရန်</h2>
+      <button type="button" class="close-btn" id="closeBtn">✕</button>
+    </div>
+    <form id="addForm">
+      <div class="form-group">
+        <label>ဆိုင်အမျိုးအစား</label>
+        <select id="fBrand" required>
+          <option value="CoCo">CoCo</option>
+          <option value="G&G">G&G</option>
+          <option value="Lar Lar">Lar Lar</option>
+          <option value="Other">အခြား</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>ဆိုင်အမည်</label>
+        <input id="fName" type="text" placeholder="CoCo Branch 1" required>
+      </div>
+      <div class="form-group">
+        <label>လိပ်စာ / လမ်းနာမည်</label>
+        <input id="fAddr" type="text" placeholder="(84) လမ်း၊ (30x77)" required>
+      </div>
+      <div class="form-group">
+        <label>မြို့နယ်</label>
+        <input id="fTown" type="text" placeholder="ချမ်းအေးသာစံ" required>
+      </div>
+      <div class="form-group">
+        <label>ဖုန်း</label>
+        <input id="fPhone" type="tel" placeholder="09-xxxxxxxxx">
+      </div>
+      <div class="form-group">
+        <button type="button" class="card-link" id="fGps">📍 တည်နေရာယူမည်</button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" id="cancelBtn">မထည့်ပါ</button>
+        <button type="submit" class="btn-primary">ထည့်မည်</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    function getBrands() {
+      const brands = [...new Set(state.shops.concat(state.mine)
+        .filter(s => s.city_mm === 'မန္တလေး')
+        .map(s => s.brand_name || s.name)
+        .filter(Boolean))].sort((a,b) => String(a).localeCompare(String(b), 'my'));
+      return [['all', 'အားလုံး'], ...brands.map(b => [b, b])];
+    }
+
+    function refreshBrandOptions() {
+      const brands = getBrands().filter(([v]) => v !== 'all').map(([v,l]) => v);
+      $('#fBrand').innerHTML = brands.map(b => `<option value="${esc(b)}">${esc(b)}</option>`).join('')
+        + '<option value="Other">အခြား</option>';
+    }
+
+    const state = {
+      shops: [],
+      mine: [],
+      brand: 'all',
+      town: 'all',
+      query: '',
+      favOnly: false,
+      pos: null,
+      favs: new Set()
+    };
+
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => [...document.querySelectorAll(sel)];
+
+    function esc(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function norm(str) {
+      const mm = '၀၁၂၃၄၅၆၇၈၉';
+      return String(str || '')
+        .toLowerCase()
+        .replace(/[၀-၉]/g, c => mm.indexOf(c))
+        .replace(/[×✕*]/g, 'x')
+        .replace(/\s*x\s*/g, 'x')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function toast(msg) {
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.textContent = msg;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2400);
+    }
+
+    function dist(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = ((lat2 - lat1) * Math.PI) / 180;
+      const dLon = ((lon2 - lon1) * Math.PI) / 180;
+      const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+      return 2 * R * Math.asin(Math.sqrt(a));
+    }
+
+    function mapsUrl(shop) {
+      if (shop.lat && shop.lng) return `https://www.google.com/maps/search/?api=1&query=${shop.lat},${shop.lng}`;
+      const cityHint = 'မန္တလေး';
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.address_mm || shop.name || '')} ${encodeURIComponent(cityHint)}`;
+    }
+
+    function save() {
+      try { localStorage.setItem('favs', JSON.stringify([...state.favs])); } catch (e) {}
+      try { localStorage.setItem('mine', JSON.stringify(state.mine)); } catch (e) {}
+    }
+
+    function render() {
+      const q = norm(state.query).split(' ').filter(Boolean);
+      let rows = state.shops.concat(state.mine).filter(s => {
+        const hay = norm([s.brand_name, s.name, s.branch, s.address_mm, s.township_mm, s.phone].join(' '));
+        return (state.brand === 'all' || s.brand_name === state.brand) &&
+               (state.town === 'all' || s.township_mm === state.town) &&
+               s.city_mm === 'မန္တလေး' &&
+               (s.category ? s.category === 'mini_market' : true) &&
+               (s.status ? s.status === 'active' : true) &&
+               (!state.favOnly || state.favs.has(s.id)) &&
+               q.every(t => hay.includes(t));
+      });
+
+      if (state.pos) {
+        rows = rows.map(s => ({ ...s, _d: s.lat && s.lng ? dist(state.pos.lat, state.pos.lng, s.lat, s.lng) : null }))
+          .sort((a, b) => (a._d ?? 999) - (b._d ?? 999));
+      }
+
+      $('#count').textContent = `${rows.length} ဆိုင်`;
+
+      $('#cards').innerHTML = !rows.length ? '<div class="empty"><div class="empty-icon">🔍</div>ရှာလိုတဲ့ ဆိုင်မမတွေ့ပါ</div>'
+        : rows.map((s, i) => {
+          const isFav = state.favs.has(s.id);
+          const distText = Number.isFinite(s._d) ? `<div class="card-distance">📍 ${s._d.toFixed(1)} km</div>` : '';
+          return `
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">${esc(s.brand_name || 'Minimart')} ${esc(s.branch || '')}</div>
+                <button class="card-badge ${isFav ? 'active' : ''}" data-fav="${esc(s.id)}">★</button>
+              </div>
+              <div class="card-meta">
+                <span class="meta-tag">${esc(s.township_mm || 'မန္တလေး')}</span>
+              </div>
+              <div class="card-address">${esc(s.address_mm || s.name || 'လိပ်စာမရှိ')}</div>
+              ${s.phone ? `<div class="card-phone">☎ <a href="tel:${encodeURIComponent(s.phone)}">${esc(s.phone)}</a></div>` : ''}
+              ${distText}
+              <div class="card-actions">
+                <a class="card-link" target="_blank" rel="noopener" href="${mapsUrl(s)}">Maps</a>
+                ${s.foodpanda_url ? `<a class="card-link" target="_blank" rel="noopener" href="${s.foodpanda_url}">Food</a>` : ''}
+                <button class="card-link" type="button" data-share="${i}">Share</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      $$('[data-fav]').forEach(b => {
+        b.onclick = () => {
+          const id = b.dataset.fav;
+          state.favs.has(id) ? state.favs.delete(id) : state.favs.add(id);
+          save();
+          render();
+        };
+      });
+
+      $$('[data-share]').forEach(b => {
+        b.onclick = () => {
+          const s = rows[+b.dataset.share];
+          const txt = `${s.brand_name} ${s.branch || ''}\n${s.address_mm || ''}\n${s.phone || ''}\n${mapsUrl(s)}`;
+          navigator.share ? navigator.share({ text: txt }) : navigator.clipboard?.writeText(txt).then(() => toast('Copied'));
+        };
+      });
+
+      $('#brands').innerHTML = getBrands().map(([v, l]) => `
+        <button class="filter-chip ${state.brand === v ? 'active' : ''}" data-brand="${v}">${esc(l)}</button>
+      `).join('');
+      $$('#brands [data-brand]').forEach(b => { b.onclick = () => { state.brand = b.dataset.brand; render(); }; });
+
+      const towns = [...new Set(state.shops.concat(state.mine).filter(s => s.city_mm === 'မန္တလေး').map(s => s.township_mm).filter(Boolean))].sort();
+      $('#towns').innerHTML = [['all', 'မြို့နယ်အားလုံး'], ...towns.map(t => [t, t])]
+        .map(([v, l]) => `<button class="filter-chip ${state.town === v ? 'active' : ''}" data-town="${v}">${esc(l)}</button>`).join('');
+      $$('#towns [data-town]').forEach(b => { b.onclick = () => { state.town = b.dataset.town; render(); }; });
+    }
+
+    function readStore(key, fallback) {
+      try {
+        const value = JSON.parse(localStorage.getItem(key) || 'null');
+        return value ?? fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    function loadData() {
+      $('#status').textContent = 'ဒေတာဖတ်နေသည်…';
+      fetch('./shops.json', { cache: 'no-store' })
+        .then(r => {
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          return r.json();
+        })
+        .then(d => {
+          if (!d || !Array.isArray(d.shops)) throw new Error('Invalid dataset');
+          state.shops = d.shops.filter(s =>
+            s &&
+            s.city_mm === 'မန္တလေး' &&
+            s.category === 'mini_market' &&
+            s.status === 'active'
+          );
+          state.mine = readStore('mine', []).filter(s => s && s.city_mm === 'မန္တလေး');
+          refreshBrandOptions();
+          const validIds = new Set(state.shops.map(s => s.id).concat(state.mine.map(s => s.id)));
+          state.favs = new Set(readStore('favs', []).filter(id => validIds.has(id)));
+          $('#status').textContent = `${state.shops.length} Mandalay listings`;
+          render();
+        })
+        .catch((err) => {
+          state.shops = [];
+          state.mine = readStore('mine', []).filter(s => s && s.city_mm === 'မန္တလေး');
+          refreshBrandOptions();
+          $('#count').textContent = 'ဒေတာ မရနိုင်သေးပါ';
+          $('#status').textContent = 'shops.json မတွေ့ပါ';
+          $('#cards').innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><strong>ဒေတာဖတ်မရပါ</strong><br><small>GitHub repository root ထဲမှာ index.html နဲ့ shops.json နှစ်ခုလုံးရှိကြောင်း စစ်ပါ။</small></div>';
+          console.error('Mandalay dataset load failed:', err);
+        });
+    }
+
+    $('#search').addEventListener('input', (e) => { state.query = e.target.value; render(); });
+    $('#searchBtn').addEventListener('click', () => render());
+
+    $('#locBtn').addEventListener('click', () => {
+      if (!navigator.geolocation) return toast('GPS မရနိုင်');
+      toast('တည်နေရာယူနေသည်…');
+      navigator.geolocation.getCurrentPosition(
+        (p) => { state.pos = { lat: p.coords.latitude, lng: p.coords.longitude }; toast('ရပြီ'); render(); },
+        () => toast('တည်နေရာ ရယူမရခဲ့')
+      );
+    });
+
+    $('#favBtn').addEventListener('click', () => { state.favOnly = !state.favOnly; $('#favBtn').classList.toggle('active', state.favOnly); render(); });
+
+    $('#closeBtn').addEventListener('click', () => $('#modal').close());
+    $('#cancelBtn').addEventListener('click', () => $('#modal').close());
+
+    let fPos = null;
+    $('#addBtn').addEventListener('click', () => {
+      fPos = null;
+      $('#fGps').textContent = '📍 တည်နေရာယူမည်';
+      $('#modal').showModal();
+    });
+
+    $('#fGps').addEventListener('click', () => {
+      if (!navigator.geolocation) return toast('GPS မရ');
+      navigator.geolocation.getCurrentPosition(
+        (p) => { fPos = { lat: p.coords.latitude, lng: p.coords.longitude }; $('#fGps').textContent = '✓ ရပြီ'; },
+        () => toast('တည်နေရာ ရယူမရခဲ့')
+      );
+    });
+
+    $('#addForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      state.mine.push({
+        id: 'my-' + Date.now(),
+        brand_name: $('#fBrand').value,
+        name: $('#fName').value,
+        branch: '',
+        address_mm: $('#fAddr').value.trim(),
+        township_mm: $('#fTown').value.trim(),
+        city_mm: 'မန္တလေး',
+        state_mm: 'မန္တလေးတိုင်းဒေသကြီး',
+        phone: $('#fPhone').value.trim(),
+        category: 'mini_market',
+        status: 'active',
+        source: 'User added',
+        confidence: 'user-added',
+        lat: fPos?.lat,
+        lng: fPos?.lng
+      });
+      save();
+      $('#modal').close();
+      $('#addForm').reset();
+      toast('ထည့်ပြီးပါပြီ');
+      render();
+    });
+
+    loadData();
+  </script>
+</body>
+</html>
