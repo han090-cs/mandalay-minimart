@@ -51,6 +51,34 @@
       color: var(--text-muted);
     }
 
+    /* City Selector */
+    .city-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border);
+    }
+    .city-btn {
+      padding: 8px 14px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .city-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+    .city-btn.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
     /* Search */
     .search-box {
       display: flex;
@@ -401,6 +429,7 @@
       .search-box { flex-direction: column; }
       .actions { grid-template-columns: 1fr 1fr; }
       dialog { width: 95vw; padding: 16px; }
+      .city-selector { flex-wrap: wrap; }
     }
   </style>
 </head>
@@ -410,6 +439,8 @@
       <div class="logo">🏪 Myanmar Minimart</div>
       <div class="subtitle">CoCo · G&G · Lar Lar · City Mart ရှာဖွေရေး</div>
     </header>
+
+    <div class="city-selector" id="citySelector"></div>
 
     <div class="search-box">
       <input id="search" type="search" placeholder="လမ်း / နံပါတ် / မြို့နယ် ရိုက်ပါ" aria-label="Search">
@@ -454,7 +485,7 @@
       </div>
       <div class="form-group">
         <label>လိပ်စာ</label>
-        <input id="fAddr" type="text" placeholder="(84) ���မ်း၊ (30x77)" required>
+        <input id="fAddr" type="text" placeholder="(84) လမ်း၊ (30x77)" required>
       </div>
       <div class="form-group">
         <label>မြို့နယ် / ရှပ်</label>
@@ -484,11 +515,21 @@
       ['Other', 'အခြား']
     ];
 
+    const CITIES = [
+      ['Mandalay', 'မန္တလေး'],
+      ['Yangon', 'ရန်ကုန်'],
+      ['Naypyidaw', 'နေပြည်တော်'],
+      ['Bagan', 'ပုဂ္ဂလိက'],
+      ['Taunggyi', 'တောင်ကြီး'],
+      ['All', 'အားလုံး']
+    ];
+
     const state = {
       shops: [],
       mine: [],
       brand: 'all',
       town: 'all',
+      city: 'Mandalay',
       query: '',
       favOnly: false,
       pos: null,
@@ -533,7 +574,7 @@
 
     function mapsUrl(shop) {
       if (shop.lat && shop.lng) return `https://www.google.com/maps/search/?api=1&query=${shop.lat},${shop.lng}`;
-      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.address_mm || shop.name || '')} Mandalay`;
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.address_mm || shop.name || '')} ${shop.city_mm}`;
     }
 
     function save() {
@@ -547,6 +588,7 @@
         const hay = norm([s.brand_name, s.name, s.branch, s.address_mm, s.township_mm, s.phone].join(' '));
         return (state.brand === 'all' || s.brand_name === state.brand) &&
                (state.town === 'all' || s.township_mm === state.town) &&
+               (state.city === 'All' || s.city_mm === state.city) &&
                (!state.favOnly || state.favs.has(s.id)) &&
                q.every(t => hay.includes(t));
       });
@@ -607,10 +649,24 @@
       $$('#brands [data-brand]').forEach(b => { b.onclick = () => { state.brand = b.dataset.brand; render(); }; });
 
       // Render town filters
-      const towns = [...new Set(state.shops.concat(state.mine).map(s => s.township_mm).filter(Boolean))].sort();
+      const towns = [...new Set(state.shops.concat(state.mine).filter(s => state.city === 'All' || s.city_mm === state.city).map(s => s.township_mm).filter(Boolean))].sort();
       $('#towns').innerHTML = [['all', 'မြို့နယ်အားလုံး'], ...towns.map(t => [t, t])]
         .map(([v, l]) => `<button class="filter-chip ${state.town === v ? 'active' : ''}" data-town="${v}">${esc(l)}</button>`).join('');
       $$('#towns [data-town]').forEach(b => { b.onclick = () => { state.town = b.dataset.town; render(); }; });
+    }
+
+    function renderCities() {
+      $('#citySelector').innerHTML = CITIES.map(([v, l]) => `
+        <button type="button" class="city-btn ${state.city === v ? 'active' : ''}" data-city="${v}">${esc(l)}</button>
+      `).join('');
+      $$('#citySelector [data-city]').forEach(b => {
+        b.onclick = () => {
+          state.city = b.dataset.city;
+          state.town = 'all';
+          renderCities();
+          render();
+        };
+      });
     }
 
     function loadData() {
@@ -620,6 +676,7 @@
           state.shops = d.shops || [];
           state.mine = JSON.parse(localStorage.getItem('mine') || '[]');
           state.favs = new Set(JSON.parse(localStorage.getItem('favs') || '[]'));
+          renderCities();
           render();
         })
         .catch(() => {
@@ -668,6 +725,7 @@
         branch: '',
         address_mm: $('#fAddr').value,
         township_mm: $('#fTown').value,
+        city_mm: state.city,
         phone: $('#fPhone').value,
         lat: fPos?.lat,
         lng: fPos?.lng
