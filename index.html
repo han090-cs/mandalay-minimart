@@ -35,7 +35,6 @@
       padding: 16px 14px 48px;
     }
 
-    /* Header */
     header {
       margin-bottom: 24px;
     }
@@ -51,13 +50,13 @@
       color: var(--text-muted);
     }
 
-    /* City Selector */
     .city-selector {
       display: flex;
       gap: 8px;
       margin-bottom: 16px;
       padding-bottom: 12px;
       border-bottom: 2px solid var(--border);
+      flex-wrap: wrap;
     }
     .city-btn {
       padding: 8px 14px;
@@ -79,7 +78,6 @@
       border-color: var(--accent);
     }
 
-    /* Search */
     .search-box {
       display: flex;
       gap: 8px;
@@ -116,7 +114,6 @@
       box-shadow: var(--shadow);
     }
 
-    /* Quick actions */
     .actions {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -144,7 +141,6 @@
       border-color: var(--accent);
     }
 
-    /* Filters */
     .filters-scroll {
       display: flex;
       gap: 8px;
@@ -175,7 +171,6 @@
       border-color: var(--accent);
     }
 
-    /* Results header */
     .results-header {
       display: flex;
       justify-content: space-between;
@@ -189,7 +184,6 @@
       color: var(--accent);
     }
 
-    /* Cards */
     .cards {
       display: grid;
       gap: 12px;
@@ -290,7 +284,6 @@
       color: white;
     }
 
-    /* Empty state */
     .empty {
       text-align: center;
       padding: 48px 16px;
@@ -301,7 +294,6 @@
       margin-bottom: 12px;
     }
 
-    /* Modal */
     dialog {
       border: none;
       border-radius: 12px;
@@ -393,7 +385,6 @@
       border-color: var(--accent);
     }
 
-    /* Toast */
     .toast {
       position: fixed;
       bottom: 20px;
@@ -409,7 +400,6 @@
       box-shadow: var(--shadow);
     }
 
-    /* Dark mode */
     @media (prefers-color-scheme: dark) {
       :root {
         --bg: #1a1410;
@@ -422,14 +412,12 @@
       }
     }
 
-    /* Mobile */
     @media (max-width: 480px) {
       .container { padding: 12px 12px 40px; }
       .logo { font-size: 1.5rem; }
       .search-box { flex-direction: column; }
       .actions { grid-template-columns: 1fr 1fr; }
       dialog { width: 95vw; padding: 16px; }
-      .city-selector { flex-wrap: wrap; }
     }
   </style>
 </head>
@@ -524,14 +512,6 @@
       ['All', 'အားလုံး']
     ];
 
-    const CITY_ALIASES = {
-      Mandalay: ['mandalay', 'မန္တလေး'],
-      Yangon: ['yangon', 'ရန်ကုန်'],
-      Naypyidaw: ['naypyidaw', 'နေပြည်တော်'],
-      Bagan: ['bagan', 'ပုဂ္ဂလိက', 'ဗုဒ္ဓဂယာ'],
-      Taunggyi: ['taunggyi', 'တောင်ကြီး']
-    };
-
     const state = {
       shops: [],
       mine: [],
@@ -546,6 +526,32 @@
 
     const $ = (sel) => document.querySelector(sel);
     const $$ = (sel) => [...document.querySelectorAll(sel)];
+
+    function normalizeText(value) {
+      return String(value || '')
+        .toLowerCase()
+        .replace(/[\u200B-\u200D\uFEFF]/g, '')
+        .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function resolveCity(shop) {
+      const text = [shop.city_mm, shop.state_mm, shop.township_mm, shop.address_mm, shop.name].join(' ');
+      const n = normalizeText(text);
+
+      if (n.includes('yangon') || n.includes('ရန်ကုန်') || n.includes('rangoon')) return 'Yangon';
+      if (n.includes('naypyidaw') || n.includes('နေပြည်တော်')) return 'Naypyidaw';
+      if (n.includes('bagan') || n.includes('ပုဂ္ဂလိက') || n.includes('ဗုဒ္ဓဂယာ')) return 'Bagan';
+      if (n.includes('taunggyi') || n.includes('တောင်ကြီး')) return 'Taunggyi';
+      if (n.includes('mandalay') || n.includes('မန္တလေး')) return 'Mandalay';
+      return 'Mandalay';
+    }
+
+    function cityMatches(shop, cityName) {
+      if (cityName === 'All') return true;
+      return resolveCity(shop) === cityName;
+    }
 
     function esc(str) {
       const div = document.createElement('div');
@@ -562,13 +568,6 @@
         .replace(/\s*x\s*/g, 'x')
         .replace(/\s+/g, ' ')
         .trim();
-    }
-
-    function cityMatches(shop, cityName) {
-      if (cityName === 'All') return true;
-      const hay = [shop.city_mm, shop.township_mm, shop.state_mm, shop.address_mm].join(' ').toLowerCase();
-      const aliases = CITY_ALIASES[cityName] || [];
-      return aliases.some(v => hay.includes(String(v).toLowerCase()));
     }
 
     function toast(msg) {
@@ -658,13 +657,11 @@
         };
       });
 
-      // Render brand filters
       $('#brands').innerHTML = BRANDS.map(([v, l]) => `
         <button class="filter-chip ${state.brand === v ? 'active' : ''}" data-brand="${v}">${esc(l)}</button>
       `).join('');
       $$('#brands [data-brand]').forEach(b => { b.onclick = () => { state.brand = b.dataset.brand; render(); }; });
 
-      // Render town filters
       const towns = [...new Set(state.shops.concat(state.mine).filter(s => cityMatches(s, state.city)).map(s => s.township_mm).filter(Boolean))].sort();
       $('#towns').innerHTML = [['all', 'မြို့နယ်အားလုံး'], ...towns.map(t => [t, t])]
         .map(([v, l]) => `<button class="filter-chip ${state.town === v ? 'active' : ''}" data-town="${v}">${esc(l)}</button>`).join('');
