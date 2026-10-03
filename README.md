@@ -1,44 +1,65 @@
-# CoCo Mandalay Finder
+# Myanmar Minimart Finder
 
-Mobile-first static website for finding CoCo Convenience Store branches in Mandalay.
+A mobile-first static web app for finding convenience stores and minimarts across Myanmar, with an emphasis on CoCo, G&G, Lar Lar, City Mart, Ocean, and other local minimart brands.
 
-## Run
-No Python package or Node.js is required.
+## Live demo
 
-Linux/macOS:
-    python3 -m http.server 8080
+To run locally:
+
+```bash
+python3 -m http.server 8080
+```
 
 Then open:
-    http://localhost:8080
 
-Or deploy the whole folder to any static hosting service.
-
-## Data
-`data/shops.json` contains records collected from public online listings on 2026-10-03.
-
-Confidence:
-- verified: address/phone supported by a business directory; some also cross-checked with Foodpanda.
-- online-listed: Foodpanda branch listing exists, but exact street/township/phone was not independently verified here.
-- directory-listed: public directory listing exists but branch identity may need cross-checking.
-
-IMPORTANT: This is a working initial dataset, not a claim that it contains every CoCo branch in Mandalay. Do not present the count as exhaustive until every township/branch has been cross-checked.
+```text
+http://localhost:8080
+```
 
 ## Features
-- Myanmar-friendly mobile UI
-- Search by shop name, street, branch code, township, phone
-- Township filter
-- Google Maps search link
-- Detail modal
-- Foodpanda link when available
-- No API key required
-- No backend required
 
-## v2 additions
-- Brand chips: CoCo / G&G / Lar Lar / City Mart / Ocean / Capital / Minimart
-- Street search accepts Burmese or English digits (e.g. "၈၄" = "84", "30x77")
-- "My nearest" button uses phone GPS; Google Maps live-search buttons find every real branch near you
-- Call (tel:), Foodpanda order link, share, favourites (saved on device)
-- Add-your-own shops (GPS pin, saved on device) + JSON export
-- Dark mode, system Myanmar font stack (no font file needed)
+- Mobile-friendly Myanmar UI
+- Search by shop name, address, township, phone number, city, or state
+- Brand filters for CoCo, G&G, Lar Lar, City Mart, Ocean, Capital, and minimart brands
+- Nearby shop lookup using browser GPS
+- Quick Google Maps links
+- Foodpanda links when available
+- Share functionality
+- Favorite-saving on the device
+- Add-your-own shop entry with local storage
+- Dark mode and responsive layout
+- No backend or API key required
 
-NOTE: shops.json has 23 CoCo + 9 G&G records (3 with confirmed addresses, 6 Foodpanda-listed only). Lar Lar / other chains are found through the live Google Maps buttons until their branches are added to shops.json (use brand_name, lat, lng fields; lat/lng enables distance sorting).
+## Data note
+
+This project uses a working directory dataset stored in `shops.json`.
+
+It is intended for local discovery and demo use, and the dataset should be treated as an evolving directory rather than a fully exhaustive national registry. The app is designed to make it easy to update and expand over time as more verified information becomes available.
+
+## Project structure
+
+```text
+.
+├── index.html
+├── shops.json
+├── README.md
+├── manifest.webmanifest
+└── .gitignore
+```
+
+## Data quality notes
+
+- Verified: linked to a reliable directory and/or cross-checked with public sources
+- Online-listed: appears in a Foodpanda or online branch listing but may need further verification
+- Directory-listed: present in a directory listing, but exact branch details may still need confirmation
+
+## Why this is useful
+
+- Easy to browse on mobile devices
+- Helpful for people looking for nearby minimart branches
+- Good for a personal project, local community listing, or small-scale demo
+- Lightweight and easy to deploy on GitHub Pages, Netlify, or a simple static web host
+
+## License
+
+This project is provided as-is for demo, local use, and community-focused development.
