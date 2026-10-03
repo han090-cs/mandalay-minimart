@@ -1,107 +1,844 @@
 <!doctype html>
 <html lang="my">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#183f3a">
-<meta name="description" content="Mandalay CoCo Convenience Store Finder">
-<title>Mandalay Minimart Finder</title>
-<style>
-:root{--bg:#edf5f2;--panel:#f8fcfa;--card:#fff;--text:#17322f;--muted:#66807b;--accent:#1d6b61;--accent2:#d9eee8;--border:#d4e4df;--shadow:0 10px 28px rgba(28,70,63,.08)}
-*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:"Myanmar Text","Noto Sans Myanmar",Padauk,Pyidaungsu,system-ui,sans-serif}
-body{min-height:100vh}.wrap{max-width:760px;margin:auto;padding:18px 14px 40px}
-.hero{padding:8px 4px 18px}.brand{font-size:28px;font-weight:900;letter-spacing:-.5px}.tag{color:var(--muted);font-size:14px;margin-top:4px}
-.searchbox{display:flex;gap:8px;margin-bottom:11px}.searchbox input{min-width:0;flex:1;height:50px;border:1px solid var(--border);border-radius:16px;padding:0 15px;background:var(--panel);color:var(--text);font-size:16px;outline:none}.searchbox input:focus{border-color:var(--accent)}
-button,.mapbtn{font:inherit;cursor:pointer}.searchbtn{height:50px;border:0;border-radius:16px;background:var(--accent);color:#fff;font-weight:800;padding:0 17px}
-.filters{display:flex;gap:7px;overflow:auto;padding:2px 1px 9px;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}.chip{white-space:nowrap;border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:999px;padding:9px 13px}.chip.active{background:var(--accent2);border-color:#b9dbd3;font-weight:800}
-.bar{display:flex;justify-content:space-between;align-items:center;margin:8px 2px 11px;color:var(--muted);font-size:13px}.cards{display:grid;gap:11px}.card{background:var(--card);border:1px solid var(--border);border-radius:19px;padding:15px;box-shadow:var(--shadow)}.top{display:flex;justify-content:space-between;gap:10px}.name{font-size:17px;font-weight:900}.branch{font-size:12px;color:var(--accent);background:var(--accent2);border-radius:999px;padding:5px 8px;white-space:nowrap}.addr{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.65}.phone{margin-top:6px;font-size:13px}.actions{display:flex;gap:8px;margin-top:13px}.act{flex:1;min-height:43px;border:1px solid var(--border);border-radius:12px;background:var(--panel);color:var(--text);font-weight:800}.act.primary{background:var(--accent);color:#fff;border-color:var(--accent)}.empty{background:var(--panel);border:1px dashed var(--border);border-radius:18px;padding:28px;text-align:center;color:var(--muted)}
-dialog{border:0;border-radius:22px;width:min(92vw,520px);padding:0;background:var(--card);color:var(--text);box-shadow:0 24px 80px rgba(0,0,0,.25)}dialog::backdrop{background:rgba(10,35,31,.45)}.modal{padding:20px}.close{float:right;border:0;background:var(--accent2);border-radius:50%;width:40px;height:40px}.modal h2{margin:0 48px 8px 0}.meta{color:var(--muted);font-size:14px;line-height:1.7}.notice{margin-top:14px;padding:12px;border-radius:13px;background:#f2f6f4;font-size:12px;color:var(--muted)}
-@media(max-width:390px){.wrap{padding-left:11px;padding-right:11px}.brand{font-size:25px}.searchbtn{padding:0 13px}.card{padding:13px}}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#183f3a">
+  <meta name="description" content="Mandalay minimart finder for CoCo, G&G, Lar Lar and other convenience brands.">
+  <title>Mandalay Minimart Finder</title>
+  <style>
+    :root {
+      --bg: #edf5f2;
+      --panel: #f8fcfa;
+      --card: #ffffff;
+      --text: #17322f;
+      --muted: #66807b;
+      --accent: #1d6b61;
+      --accent-2: #d9eee8;
+      --border: #d4e4df;
+      --shadow: 0 10px 28px rgba(28,70,63,.08);
+      --danger: #d65f5f;
+      --toast: rgba(11, 30, 27, .92);
+    }
 
-@media(prefers-color-scheme:dark){:root{--bg:#0f1b19;--panel:#17282500;--panel:#172825;--card:#1b2d2a;--text:#e6f2ef;--muted:#93aaa5;--accent:#2a9d8f;--accent2:#1f3d38;--border:#2b4540;--shadow:none}.notice{background:#14231f}}
-.toolbar{display:flex;gap:8px;margin-bottom:10px}.toolbar button{flex:1;min-height:46px;border-radius:14px;border:1px solid var(--border);background:var(--panel);color:var(--text);font-weight:800}.toolbar .loc{background:var(--accent);color:#fff;border-color:var(--accent)}
-.brands{display:flex;gap:7px;overflow:auto;padding:2px 1px 8px;scrollbar-width:none}.brands::-webkit-scrollbar{display:none}
-.live{background:var(--accent2);border:1px dashed var(--accent);border-radius:19px;padding:15px;margin-bottom:11px}.live b{display:block;margin-bottom:6px}.live .actions{flex-wrap:wrap}.live .act{flex:1 1 40%}
-.act{display:grid;place-items:center;text-decoration:none;text-align:center;font-size:14px;padding:0 6px}.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.tag2{font-size:11px;border-radius:999px;padding:3px 8px;background:var(--accent2);color:var(--accent)}.tag2.warn{background:#fff3d6;color:#8a5a00}
-.fav{border:0;background:none;font-size:22px;line-height:1;padding:0 4px;color:var(--muted)}.fav.on{color:#e8a200}.dist{font-size:12px;color:var(--accent);font-weight:800}
-.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#17322f;color:#fff;padding:11px 16px;border-radius:14px;font-size:14px;z-index:9;max-width:90vw}
-.fm{display:grid;gap:9px;margin-top:12px}.fm input,.fm select{height:46px;border:1px solid var(--border);border-radius:12px;padding:0 12px;background:var(--panel);color:var(--text);font:inherit;font-size:16px}.toolbar button{font-size:13px;padding:0 4px}
-</style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Myanmar Text", "Noto Sans Myanmar", "Padauk", "Pyidaungsu", system-ui, sans-serif;
+      min-height: 100vh;
+    }
+    a { color: inherit; }
+    button, input, select { font: inherit; }
+
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 18px 14px 48px;
+    }
+
+    .hero {
+      padding: 8px 4px 18px;
+    }
+    .brand {
+      font-size: clamp(1.7rem, 5vw, 2.3rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+    .tag {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    .searchbox {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .searchbox input {
+      flex: 1;
+      min-width: 0;
+      height: 50px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--panel);
+      color: var(--text);
+      padding: 0 15px;
+      font-size: 1rem;
+      outline: none;
+    }
+    .searchbox input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(29,107,97,0.12);
+    }
+    .searchbtn {
+      height: 50px;
+      border: 0;
+      border-radius: 16px;
+      background: var(--accent);
+      color: white;
+      font-weight: 800;
+      padding: 0 18px;
+      cursor: pointer;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      margin: 10px 0 12px;
+    }
+    .toolbar button {
+      flex: 1;
+      min-height: 46px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .toolbar .active {
+      background: var(--accent-2);
+      border-color: var(--accent);
+    }
+
+    .brands, .filters {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding: 2px 1px 10px;
+      scrollbar-width: none;
+    }
+    .brands::-webkit-scrollbar, .filters::-webkit-scrollbar { display: none; }
+    .chip {
+      white-space: nowrap;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--panel);
+      color: var(--text);
+      padding: 7px 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .chip.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .live {
+      background: var(--accent-2);
+      border: 1px dashed var(--accent);
+      border-radius: 18px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .live h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .act {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      padding: 0 10px;
+      border-radius: 10px;
+      background: var(--card);
+      color: var(--text);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    .bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin: 8px 2px 12px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .cards {
+      display: grid;
+      gap: 12px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px 14px 12px;
+      box-shadow: var(--shadow);
+    }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .name {
+      font-weight: 800;
+      font-size: 1.05rem;
+      margin-bottom: 5px;
+      line-height: 1.4;
+    }
+    .meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .addr {
+      margin-top: 8px;
+      line-height: 1.65;
+      font-size: 0.92rem;
+    }
+    .phone {
+      margin-top: 8px;
+      font-size: 0.9rem;
+    }
+    .phone a {
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .tag2 {
+      font-size: 0.7rem;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--accent-2);
+      color: var(--accent);
+      border: 1px solid rgba(29,107,97,0.15);
+      font-weight: 700;
+    }
+    .actions-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .mini-btn {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      cursor: pointer;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .fav {
+      border: 0;
+      background: none;
+      font-size: 1.4rem;
+      line-height: 1;
+      padding: 0 4px;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .fav.on {
+      color: #e8a200;
+    }
+    .dist {
+      font-size: 0.7rem;
+      color: var(--accent);
+      font-weight: 800;
+      margin-top: 4px;
+    }
+
+    dialog {
+      border: 0;
+      border-radius: 22px;
+      width: min(92vw, 520px);
+      padding: 0;
+      background: var(--card);
+      color: var(--text);
+      box-shadow: 0 24px 80px rgba(0,0,0,.25);
+    }
+    dialog::backdrop {
+      background: rgba(10,35,31,.45);
+    }
+    .modal {
+      padding: 18px 18px 16px;
+    }
+    .close {
+      position: absolute;
+      right: 16px;
+      top: 12px;
+      width: 32px;
+      height: 32px;
+      border: 0;
+      background: rgba(0,0,0,.05);
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    .modal h2 {
+      margin: 0 0 8px;
+      font-size: 1.2rem;
+    }
+    .meta-line {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 14px;
+    }
+    .fm {
+      display: grid;
+      gap: 10px;
+    }
+    .fm input, .fm select {
+      height: 46px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0 12px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+    }
+    .actions-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .primary-btn, .secondary-btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 800;
+    }
+    .primary-btn {
+      background: var(--accent);
+      color: white;
+    }
+    .secondary-btn {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .empty {
+      text-align: center;
+      padding: 32px 18px;
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.5);
+      color: var(--muted);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      background: var(--toast);
+      color: white;
+      padding: 11px 16px;
+      border-radius: 14px;
+      font-size: 0.88rem;
+      z-index: 30;
+      max-width: 90vw;
+      box-shadow: 0 10px 20px rgba(0,0,0,.18);
+    }
+
+    @media (max-width: 420px) {
+      .wrap { padding-left: 10px; padding-right: 10px; }
+      .toolbar { flex-direction: column; }
+      .searchbox { flex-direction: column; }
+      .searchbtn { width: 100%; }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1b19;
+        --panel: #172825;
+        --card: #1b2d2a;
+        --text: #e6f2ef;
+        --muted: #93aaa5;
+        --accent: #2a9d8f;
+        --accent-2: #1f3d38;
+        --border: #2b4540;
+        --shadow: 0 10px 28px rgba(0,0,0,.18);
+        --toast: rgba(5,14,12,.94);
+      }
+      .searchbox input, .chip, .mini-btn, .secondary-btn, .fm input, .fm select, .toolbar button {
+        color: var(--text);
+      }
+      .card, .live, .modal, .empty {
+        background: var(--card);
+      }
+    }
+  </style>
 </head>
 <body>
-<main class="wrap">
-<header class="hero"><div class="brand">Mandalay Minimart</div><div class="tag">မန္တလေး CoCo · G&amp;G · Lar Lar · minimarket ရှာဖွေရေး</div></header>
-<form class="searchbox" id="searchForm"><input id="search" type="search" placeholder="လမ်းနာမည်/နံပါတ် ရိုက်ပါ (ဥပမာ ၈၄ လမ်း၊ 30x77)" inputmode="search" enterkeyhint="search" autocomplete="off"><button class="searchbtn">ရှာမည်</button></form>
-<div class="toolbar"><button type="button" class="loc" id="locBtn">📍 ကျွန်တော့်အနီးဆုံး</button><button type="button" id="delBtn">🛵 ပို့ပေးသည်</button><button type="button" id="favBtn">★ မှတ်ထား</button><button type="button" id="addBtn">＋ ဆိုင်ထည့်</button></div>
-<nav class="brands" id="brands" aria-label="ဆိုင်အမျိုးအစား"></nav>
-<div id="live"></div>
-<nav class="filters" id="filters" aria-label="မြို့နယ်ရွေးရန်"></nav>
-<div class="bar"><span id="count">ဒေတာဖတ်နေသည်…</span><span>Updated 03 Oct 2026</span></div>
-<section class="cards" id="cards"></section>
-</main>
+  <main class="wrap">
+    <header class="hero">
+      <div class="brand">Mandalay Minimart</div>
+      <div class="tag">မန္တလေး CoCo · G&amp;G · Lar Lar · minimarket ရှာဖွေရေး</div>
+    </header>
 
-<dialog id="dialog"><div class="modal"><button class="close" id="close" aria-label="ပိတ်ရန်">×</button><h2>ဆိုင်အသစ်ထည့်ရန်</h2><div class="meta">ဆိုင်ရှေ့ရောက်နေရင် 📍 နှိပ်ပါ၊ အနီးဆုံးစီပေးတာ အတိအကျဖြစ်ပါမယ်။ (ဖုန်းထဲမှာပဲ သိမ်းပါတယ်)</div><form id="addForm" class="fm"><select id="fBrand"><option>G&amp;G</option><option>Lar Lar</option><option>CoCo</option><option>City Mart</option><option>Ocean</option><option>Capital</option><option>minimart</option></select><input id="fAddr" placeholder="လမ်း/လိပ်စာ" required><input id="fTown" placeholder="မြို့နယ်"><input id="fPhone" type="tel" placeholder="ဖုန်း (မလိုပါ)"><button type="button" class="act" id="fGps">📍 ဒီနေရာကို သုံးမည်</button><button class="act primary">သိမ်းမည်</button><button type="button" class="act" id="fExp">ထည့်ထားတာအားလုံး JSON ကူးမည်</button></form></div></dialog>
-<script>
-const BRANDS=[["all","အားလုံး",""],["CoCo","CoCo","CoCo Convenience Store"],["G&G","G&G","g&g Grab & Go"],["Lar Lar","Lar Lar","Lar Lar minimart"],["City Mart","City Mart","City Mart"],["Ocean","Ocean","Ocean Supercenter"],["Capital","Capital","Capital Supermarket"],["minimart","Minimart","minimart convenience store"]];
-const S={mine:[],shops:[],town:"all",brand:"all",q:"",del:false,favOnly:false,pos:null,favs:new Set()};
-const $=s=>document.querySelector(s);
-try{S.favs=new Set(JSON.parse(localStorage.getItem("favs")||"[]"))}catch(e){}
-try{S.mine=JSON.parse(localStorage.getItem("mine")||"[]")}catch(e){}
-const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const MM="၀၁၂၃၄၅၆၇၈၉";
-const norm=t=>String(t||"").toLowerCase().replace(/[၀-၉]/g,c=>MM.indexOf(c)).replace(/[×✕*]/g,"x").replace(/\s*x\s*/g,"x").replace(/(st|nd|rd|th|street|road)\b/g,"").replace(/လမ်း/g,"").replace(/\s+/g," ").trim();
-const brandOf=s=>s.brand_name||"CoCo";
-function toast(m){const d=document.createElement("div");d.className="toast";d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),2600)}
-function mapsUrl(s){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(s.lat?s.lat+","+s.lng:(s.maps_q||(brandOf(s)+" "+s.address_mm+" Mandalay")))}
-function nearUrl(term){const p=S.pos;return "https://www.google.com/maps/search/"+encodeURIComponent(term+(p?"":" Mandalay"))+(p?`/@${p.lat},${p.lng},16z`:"")}
-function dist(a,b,c,d){const r=x=>x*Math.PI/180,h=Math.sin(r(c-a)/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(r(d-b)/2)**2;return 12742*Math.asin(Math.sqrt(h))}
-function tel(p){return (p||"").split("/")[0].replace(/[^\d+]/g,"")}
-function saveMine(){try{localStorage.setItem("mine",JSON.stringify(S.mine))}catch(e){}}
-function save(){try{localStorage.setItem("favs",JSON.stringify([...S.favs]))}catch(e){}}
-function chips(el,list,key,fn){$(el).innerHTML=list.map(([v,l])=>`<button type="button" class="chip ${S[key]===v?"active":""}" data-v="${esc(v)}">${esc(l)}</button>`).join("");$(el).querySelectorAll(".chip").forEach(b=>b.onclick=()=>{S[key]=b.dataset.v;fn()})}
-function renderFilters(){
- const towns=[...new Set(S.shops.concat(S.mine).map(s=>s.township_mm).filter(t=>t&&t!=="Mandalay"))].sort();
- chips("#filters",[["all","မြို့နယ်အားလုံး"],...towns.map(t=>[t,t])],"town",refresh);
- chips("#brands",BRANDS.map(b=>[b[0],b[1]]),"brand",refresh);
-}
-function live(){
- const b=BRANDS.find(x=>x[0]===S.brand),term=(b&&b[2]?b[2]:"minimart convenience store")+(S.q.trim()?" "+S.q.trim():"");
- const lar=(S.brand==="all"||S.brand==="Lar Lar")?`<a class="act" target="_blank" rel="noopener" href="https://www.facebook.com/LarLarConvenienceStore/">Lar Lar Facebook</a>`:"";
- const btns=(b&&b[0]!=="all"?[[b[1],b[2]]]:BRANDS.slice(1).map(x=>[x[1],x[2]])).map(([l,t])=>`<a class="act" target="_blank" rel="noopener" href="${nearUrl(t+(S.q.trim()?" "+S.q.trim():""))}">${esc(l)}</a>`).join("")+lar+`<a class="act" target="_blank" rel="noopener" href="https://www.foodpanda.com.mm/en/city/mandalay">🛵 Foodpanda မန္တလေး</a>`;
- $("#live").innerHTML=`<div class="live"><b>🗺️ Google Maps မှာ တိုက်ရိုက်ရှာမည် (ဆိုင်အသစ်/ဆိုင်ခွဲအားလုံး)</b><div class="meta">${S.pos?"သင့်တည်နေရာအနီးကို ရှာပေးမည်":"📍 ခလုတ်နှိပ်ပြီး တည်နေရာဖွင့်ရင် အနီးဆုံးကို ပြပေးမည်"}${S.q.trim()?` · “${esc(S.q.trim())}” အနီး`:""}</div><div class="actions">${btns}</div></div>`;
-}
-function refresh(){renderFilters();live();render()}
-function render(){
- const q=norm(S.q).split(" ").filter(Boolean);
- let rows=S.shops.concat(S.mine).filter(s=>{
-  const hay=norm([brandOf(s),s.name,brandOf(s)==="G&G"?"gng grab go":"",s.name,s.branch,s.address_mm,s.township_mm,s.phone].join(" "));
-  return (S.brand==="all"||brandOf(s)===S.brand)&&(S.town==="all"||s.township_mm===S.town)&&(!S.del||s.foodpanda_url||s.phone)&&(!S.favOnly||S.favs.has(s.id))&&q.every(t=>hay.includes(t));
- });
- if(S.pos)rows.forEach(s=>s._d=s.lat?dist(S.pos.lat,S.pos.lng,s.lat,s.lng):null),rows.sort((a,b)=>(a._d??1e9)-(b._d??1e9));
- $("#count").textContent=`${rows.length} ဆိုင် (ဒေတာထဲမှာ)`;
- $("#cards").innerHTML=rows.length?rows.map((s,i)=>{const t=tel(s.phone);return `<article class="card"><div class="top"><div><div class="name">${esc(brandOf(s)==="minimart"?s.name:brandOf(s))} ${s.branch&&s.branch!=="unconfirmed"?esc(s.branch):""}</div></div><div><button class="fav ${S.favs.has(s.id)?"on":""}" data-fav="${esc(s.id)}" aria-label="မှတ်ထား">★</button></div></div><div class="addr">${esc(s.address_mm)}${s.township_mm&&s.township_mm!=="Mandalay"?` · ${esc(s.township_mm)}`:""}</div>${s._d!=null?`<div class="dist">📍 ${s._d<1?Math.round(s._d*1000)+" မီတာ":s._d.toFixed(1)+" ကီလို"}</div>`:""}${s.phone?`<div class="phone">☎ ${esc(s.phone)}</div>`:""}<div class="tags">${s.mine?'<span class="tag2">👤 ကိုယ်တိုင်ထည့်</span>':s.confidence==="verified"?'<span class="tag2">✓ အတည်ပြုပြီး</span>':'<span class="tag2 warn">မသေချာသေး</span>'}${s.foodpanda_url?'<span class="tag2">🛵 Foodpanda</span>':""}</div><div class="actions"><a class="act primary" target="_blank" rel="noopener" href="${mapsUrl(s)}">🗺️ လမ်းညွှန်</a>${t?`<a class="act" href="tel:${t}">📞 ခေါ်မည်</a>`:""}${s.foodpanda_url?`<a class="act" target="_blank" rel="noopener" href="${esc(s.foodpanda_url)}">🛵 မှာမည်</a>`:""}<button type="button" class="act" data-share="${i}">↗</button>${s.mine?`<button type="button" class="act" data-del="${esc(s.id)}">🗑</button>`:""}</div></article>`}).join(""):`<div class="empty">ဒေတာထဲမှာ မတွေ့ပါ။<br><br><a class="act primary" target="_blank" rel="noopener" href="${nearUrl((S.brand==="all"?"minimart":S.brand)+" "+S.q)}">🗺️ “${esc(S.q||"minimart")}” ကို Google Maps မှာ ရှာမည်</a></div>`;
- document.querySelectorAll("[data-fav]").forEach(b=>b.onclick=()=>{const id=b.dataset.fav;S.favs.has(id)?S.favs.delete(id):S.favs.add(id);save();render()});
- document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{if(confirm("ဖျက်မလား?")){S.mine=S.mine.filter(x=>x.id!==b.dataset.del);saveMine();refresh()}});
- document.querySelectorAll("[data-share]").forEach(b=>b.onclick=()=>{const s=rows[+b.dataset.share],txt=`${brandOf(s)} ${s.branch||""}\n${s.address_mm}\n${s.phone||""}\n${mapsUrl(s)}`;navigator.share?navigator.share({title:brandOf(s),text:txt}).catch(()=>{}):navigator.clipboard?.writeText(txt).then(()=>toast("ကူးယူပြီး"))});
-}
-$("#locBtn").onclick=()=>{
- if(!navigator.geolocation)return toast("ဒီဖုန်းမှာ တည်နေရာ မရပါ");
- toast("တည်နေရာ ရှာနေသည်…");
- navigator.geolocation.getCurrentPosition(p=>{S.pos={lat:p.coords.latitude,lng:p.coords.longitude};toast("တည်နေရာ ရပြီ ✓");refresh()},()=>toast("တည်နေရာ ခွင့်ပြုပေးပါ (Settings → Location)"),{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
-};
-$("#delBtn").onclick=e=>{S.del=!S.del;e.currentTarget.style.background=S.del?"var(--accent2)":"";render()};
-$("#favBtn").onclick=e=>{S.favOnly=!S.favOnly;e.currentTarget.style.background=S.favOnly?"var(--accent2)":"";render()};
+    <form class="searchbox" id="searchForm">
+      <input id="search" type="search" placeholder="လမ်းနာမည် / နံပါတ် / မြို့နယ် ရိုက်ပါ" aria-label="Search shops">
+      <button class="searchbtn" type="submit">ရှာမည်</button>
+    </form>
 
-let fPos=null;
-$("#addBtn").onclick=()=>{fPos=null;$("#fGps").textContent="📍 ဒီနေရာကို သုံးမည်";$("#dialog").showModal()};
-$("#close").onclick=()=>$("#dialog").close();
-$("#fGps").onclick=()=>navigator.geolocation?navigator.geolocation.getCurrentPosition(p=>{fPos={lat:p.coords.latitude,lng:p.coords.longitude};$("#fGps").textContent="✓ တည်နေရာ ရပြီ"},()=>toast("တည်နေရာ ခွင့်ပြုပေးပါ"),{enableHighAccuracy:true,timeout:12000}):toast("တည်နေရာ မရပါ");
-$("#addForm").onsubmit=e=>{e.preventDefault();const s={id:"my-"+Date.now(),brand_name:$("#fBrand").value,name:$("#fBrand").value,branch:"",address_mm:$("#fAddr").value.trim(),township_mm:$("#fTown").value.trim(),phone:$("#fPhone").value.trim(),mine:true,...(fPos||{})};S.mine.push(s);saveMine();$("#dialog").close();$("#addForm").reset();toast("သိမ်းပြီး ✓");refresh()};
-$("#fExp").onclick=()=>navigator.clipboard?.writeText(JSON.stringify(S.mine,null,1)).then(()=>toast("ကူးပြီး — ကျွန်တော့်ဆီ paste လုပ်ပါ"));
-$("#searchForm").addEventListener("submit",e=>{e.preventDefault();S.q=$("#search").value;refresh()});
-$("#search").addEventListener("input",()=>{S.q=$("#search").value;live();render()});
-fetch("data/shops.json").then(r=>r.json()).then(d=>{S.shops=d.shops||[];refresh()}).catch(()=>{$("#count").textContent="ဒေတာဖတ်မရပါ";$("#cards").innerHTML='<div class="empty">data/shops.json မတွေ့ပါ။ ZIP ကို folder အတိုင်း run လုပ်ပါ။</div>';live()});
-</script>
+    <div class="toolbar">
+      <button type="button" id="locBtn">📍 ကျွန်တော့်အနီးဆုံး</button>
+      <button type="button" id="delBtn">🛵 ရှာရန်</button>
+      <button type="button" id="favBtn">⭐ ပိုင်းစိတ်များ</button>
+    </div>
 
+    <nav class="brands" id="brands" aria-label="Brand filters"></nav>
+    <div id="live"></div>
+    <nav class="filters" id="filters" aria-label="Township filters"></nav>
+
+    <div class="bar">
+      <span id="count">ဒေတာဖတ်နေသည်…</span>
+      <span>Updated 03 Oct 2026</span>
+    </div>
+
+    <section class="cards" id="cards"></section>
+  </main>
+
+  <dialog id="dialog">
+    <div class="modal" style="position:relative">
+      <button class="close" id="close" aria-label="Close">×</button>
+      <h2>ဆိုင်အသစ်ထည့်ရန်</h2>
+      <div class="meta-line">သင့်လက်မှတ် တည်နေရာနှင့် မိမိထည့်ချင်သော အချက်အလက်ကို ပေးနိုင်ပါတယ်။</div>
+      <form id="addForm" class="fm">
+        <select id="fBrand" required>
+          <option value="CoCo">CoCo</option>
+          <option value="G&G">G&G</option>
+          <option value="Lar Lar">Lar Lar</option>
+          <option value="City Mart">City Mart</option>
+          <option value="Ocean">Ocean</option>
+          <option value="Capital">Capital</option>
+          <option value="minimart">minimart</option>
+        </select>
+        <input id="fName" type="text" placeholder="ဆိုင်အမည်" required>
+        <input id="fAddr" type="text" placeholder="လိပ်စာ" required>
+        <input id="fTown" type="text" placeholder="မြို့နယ်" required>
+        <input id="fPhone" type="text" placeholder="ဖုန်းနံပါတ်">
+        <button type="button" class="secondary-btn" id="fGps">📍 တည်နေရာယူမည်</button>
+        <div class="actions-footer">
+          <button type="button" class="secondary-btn" id="fCancel">မထည့်ပါ</button>
+          <button type="submit" class="primary-btn">ထည့်မည်</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <script>
+    const BRANDS = [
+      ['all', 'အားလုံး', ''],
+      ['CoCo', 'CoCo', 'CoCo Convenience Store'],
+      ['G&G', 'G&G', 'g&g Grab & Go'],
+      ['Lar Lar', 'Lar Lar', 'Lar Lar minimart'],
+      ['City Mart', 'City Mart', 'City Mart'],
+      ['Ocean', 'Ocean', 'Ocean'],
+      ['Capital', 'Capital', 'Capital'],
+      ['minimart', 'minimart', 'minimart']
+    ];
+
+    const state = {
+      shops: [],
+      mine: [],
+      town: 'all',
+      brand: 'all',
+      q: '',
+      del: false,
+      favOnly: false,
+      pos: null,
+      favs: new Set()
+    };
+
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+
+    function toast(message) {
+      const node = document.createElement('div');
+      node.className = 'toast';
+      node.textContent = message;
+      document.body.appendChild(node);
+      setTimeout(() => node.remove(), 2600);
+    }
+
+    function saveFavs() {
+      try { localStorage.setItem('favs', JSON.stringify([...state.favs])); } catch (e) {}
+    }
+
+    function saveMine() {
+      try { localStorage.setItem('mine', JSON.stringify(state.mine)); } catch (e) {}
+    }
+
+    function esc(value) {
+      return String(value ?? '').replace(/[&<>"']/g, (ch) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[ch]));
+    }
+
+    function normalize(value) {
+      const mm = '၀၁၂၃၄၅၆၇၈၉';
+      const text = String(value ?? '').toLowerCase();
+      return text
+        .replace(/[၀-၉]/g, (ch) => mm.indexOf(ch))
+        .replace(/[×✕*]/g, 'x')
+        .replace(/\s*x\s*/g, 'x')
+        .replace(/(st|nd|rd|th|street|road)\b/g, '')
+        .replace(/လမ်း/g, ' street ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function brandOf(shop) {
+      return shop && shop.brand_name ? shop.brand_name : 'CoCo';
+    }
+
+    function phoneDigits(value) {
+      return String(value || '').split('/')[0].replace(/[^\d+]/g, '');
+    }
+
+    function mapsUrl(shop) {
+      if (!shop) return '#';
+      if (shop.lat && shop.lng) {
+        return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(shop.lat + ',' + shop.lng);
+      }
+      const term = shop.maps_q || `${brandOf(shop)} ${shop.address_mm || shop.name || ''} Mandalay`;
+      return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(term);
+    }
+
+    function nearUrl(term) {
+      if (!term) return 'https://www.google.com/maps';
+      const p = state.pos;
+      if (p) {
+        return `https://www.google.com/maps/search/${encodeURIComponent(term)}/@${p.lat},${p.lng},16z`;
+      }
+      return 'https://www.google.com/maps/search/' + encodeURIComponent(term + ' Mandalay');
+    }
+
+    function distanceKm(lat1, lon1, lat2, lon2) {
+      const toRad = (deg) => (deg * Math.PI) / 180;
+      const r = 6371;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+      return 2 * r * Math.asin(Math.sqrt(a));
+    }
+
+    function renderBrandFilters() {
+      const html = BRANDS.map(([value, label]) => `
+        <button type="button" class="chip ${state.brand === value ? 'active' : ''}" data-brand="${esc(value)}">${esc(label)}</button>
+      `).join('');
+      $('#brands').innerHTML = html;
+
+      $$('#brands .chip').forEach((button) => {
+        button.addEventListener('click', () => {
+          state.brand = button.dataset.brand;
+          render();
+        });
+      });
+    }
+
+    function renderTownFilters() {
+      const towns = [...new Set(state.shops.concat(state.mine).map((s) => s.township_mm).filter(Boolean))].sort();
+      const items = [['all', 'မြို့နယ်အားလုံး'], ...towns.map((t) => [t, t])];
+      $('#filters').innerHTML = items.map(([value, label]) => `
+        <button type="button" class="chip ${state.town === value ? 'active' : ''}" data-town="${esc(value)}">${esc(label)}</button>
+      `).join('');
+
+      $$('#filters .chip').forEach((button) => {
+        button.addEventListener('click', () => {
+          state.town = button.dataset.town;
+          render();
+        });
+      });
+    }
+
+    function renderLive() {
+      const brand = BRANDS.find(([v]) => v === state.brand) || BRANDS[0];
+      const searchTerm = (brand[2] || 'minimart convenience store') + (state.q.trim() ? ' ' + state.q.trim() : '');
+      const buttons = (state.brand === 'all' ? BRANDS.slice(1) : [brand]).map(([v, label, term]) => {
+        const value = term || label;
+        return `<a class="act" target="_blank" rel="noopener noreferrer" href="${nearUrl(value + (state.q.trim() ? ' ' + state.q.trim() : ''))}">${esc(label)}</a>`;
+      }).join('');
+
+      $('#live').innerHTML = `
+        <div class="live">
+          <h3>🗺️ Google Maps မှာ တိုက်ရိုက်ရှာမည်</h3>
+          <div class="actions">
+            ${buttons}
+          </div>
+        </div>
+      `;
+    }
+
+    function render() {
+      renderBrandFilters();
+      renderTownFilters();
+      renderLive();
+
+      const q = normalize(state.q).split(/\s+/).filter(Boolean);
+      let rows = state.shops.concat(state.mine).filter((shop) => {
+        const hay = normalize([
+          brandOf(shop),
+          shop.name,
+          shop.branch,
+          shop.address_mm,
+          shop.township_mm,
+          shop.phone,
+          shop.source,
+          shop.maps_q || ''
+        ].join(' '));
+
+        const brandMatch = state.brand === 'all' || brandOf(shop) === state.brand;
+        const townMatch = state.town === 'all' || shop.township_mm === state.town;
+        const favMatch = !state.favOnly || state.favs.has(shop.id);
+        const queryMatch = q.every((term) => hay.includes(term));
+        const delMatch = !state.del || !!(shop.foodpanda_url || shop.phone || shop.source_url);
+
+        return brandMatch && townMatch && favMatch && queryMatch && delMatch;
+      });
+
+      if (state.pos) {
+        rows = rows.map((shop) => ({
+          ...shop,
+          _d: shop.lat && shop.lng ? distanceKm(state.pos.lat, state.pos.lng, shop.lat, shop.lng) : null
+        })).sort((a, b) => (a._d ?? Number.MAX_SAFE_INTEGER) - (b._d ?? Number.MAX_SAFE_INTEGER));
+      }
+
+      $('#count').textContent = `${rows.length} ဆိုင် (ဒေတာထဲမှာ)`;
+
+      if (!rows.length) {
+        $('#cards').innerHTML = '<div class="empty">မည်သည့်အချက်အလက်မျှ မတွေ့ပါ။ အခြားစကားလုံးဖြင့် ရှာပါ။</div>';
+        return;
+      }
+
+      $('#cards').innerHTML = rows.map((shop, index) => {
+        const phone = phoneDigits(shop.phone);
+        const isFav = state.favs.has(shop.id);
+        const distanceText = state.pos && shop._d ? `<div class="dist">📍 ${shop._d.toFixed(1)} km</div>` : '';
+        const phoneHtml = phone
+          ? `<div class="phone"><a href="tel:${encodeURIComponent(phone)}">☎ ${esc(shop.phone)}</a></div>`
+          : '<div class="phone">📞 ဖုန်းနံပါတ် မရှိပါ</div>';
+        const foodpanda = shop.foodpanda_url
+          ? `<a class="mini-btn" target="_blank" rel="noopener noreferrer" href="${shop.foodpanda_url}">Foodpanda</a>`
+          : '';
+        const mapLink = `<a class="mini-btn" target="_blank" rel="noopener noreferrer" href="${mapsUrl(shop)}">Google Maps</a>`;
+        const shareLink = `<button type="button" class="mini-btn" data-share="${index}">Share</button>`;
+        const removeBtn = shop.id && shop.id.startsWith('my-') ? `<button type="button" class="mini-btn" data-remove="${shop.id}">Delete</button>` : '';
+
+        return `
+          <article class="card">
+            <div class="top">
+              <div>
+                <div class="name">${esc(brandOf(shop))} ${esc(shop.branch || shop.name || '')}</div>
+                <div class="meta">${esc(shop.township_mm || 'Mandalay')}</div>
+              </div>
+              <button type="button" class="fav ${isFav ? 'on' : ''}" data-fav="${esc(shop.id)}" aria-label="Favourite">★</button>
+            </div>
+            ${distanceText}
+            <div class="addr">${esc(shop.address_mm || shop.name || 'လိပ်စာမရှိပါ')}</div>
+            ${phoneHtml}
+            <div class="tags">
+              <span class="tag2">${esc(shop.confidence || 'unknown')}</span>
+              ${shop.source ? `<span class="tag2">${esc(shop.source)}</span>` : ''}
+            </div>
+            <div class="actions-row">
+              ${mapLink}
+              ${foodpanda}
+              ${shareLink}
+              ${removeBtn}
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      $$('#cards [data-fav]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const id = button.dataset.fav;
+          if (state.favs.has(id)) {
+            state.favs.delete(id);
+          } else {
+            state.favs.add(id);
+          }
+          saveFavs();
+          render();
+        });
+      });
+
+      $$('#cards [data-share]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const shop = rows[Number(button.dataset.share)];
+          const shareText = `${brandOf(shop)} ${shop.branch || ''}\n${shop.address_mm || ''}\n${shop.phone || ''}\n${mapsUrl(shop)}`;
+          if (navigator.share) {
+            navigator.share({ title: 'Mandalay Minimart', text: shareText }).catch(() => {});
+          } else {
+            navigator.clipboard?.writeText(shareText).then(() => toast('Share text copied to clipboard.'));
+          }
+        });
+      });
+
+      $$('#cards [data-remove]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const id = button.dataset.remove;
+          state.mine = state.mine.filter((shop) => shop.id !== id);
+          saveMine();
+          render();
+          toast('Added shop deleted.');
+        });
+      });
+    }
+
+    function loadData() {
+      const candidates = ['shops.json', 'data/shops.json'];
+      let index = 0;
+
+      function next() {
+        if (index >= candidates.length) {
+          $('#count').textContent = 'ဒေတာဖတ်မရပါ';
+          $('#cards').innerHTML = '<div class="empty">သင့်ဒေတာဖိုင်ကိုမတွေ့ပါ။ shops.json ကို စစ်ဆေးပါ။</div>';
+          return;
+        }
+
+        fetch(candidates[index])
+          .then((response) => {
+            if (!response.ok) throw new Error('Failed');
+            return response.json();
+          })
+          .then((payload) => {
+            state.shops = Array.isArray(payload.shops) ? payload.shops : [];
+            state.mine = JSON.parse(localStorage.getItem('mine') || '[]');
+            state.favs = new Set(JSON.parse(localStorage.getItem('favs') || '[]'));
+            render();
+          })
+          .catch(() => {
+            index += 1;
+            next();
+          });
+      }
+
+      next();
+    }
+
+    $('#searchForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      state.q = $('#search').value.trim();
+      render();
+    });
+
+    $('#search').addEventListener('input', () => {
+      state.q = $('#search').value.trim();
+      render();
+    });
+
+    $('#locBtn').addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        toast('ဒီ device မှာ location အားသုံးမရပါ');
+        return;
+      }
+      toast('တည်နေရာကို ရှာနေသည်…');
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          state.pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          toast('တည်နေရာ ရပြီ ✓');
+          render();
+        },
+        () => toast('တည်နေရာ ရယူနိုင်ခဲ့ပါ။')
+      );
+    });
+
+    $('#delBtn').addEventListener('click', () => {
+      state.del = !state.del;
+      $('#delBtn').classList.toggle('active', state.del);
+      render();
+    });
+
+    $('#favBtn').addEventListener('click', () => {
+      state.favOnly = !state.favOnly;
+      $('#favBtn').classList.toggle('active', state.favOnly);
+      render();
+    });
+
+    $('#close').addEventListener('click', () => {
+      $('#dialog').close();
+    });
+
+    $('#fCancel').addEventListener('click', () => {
+      $('#dialog').close();
+    });
+
+    let fPos = null;
+
+    $('#fGps').addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        toast('GPS မရနိုင်ပါ');
+        return;
+      }
+      toast('တည်နေရာယူနေသည်…');
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          fPos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          $('#fGps').textContent = '✓ တည်နေရာရပြီ';
+          toast('တည်နေရာရပြီ');
+        },
+        () => toast('တည်နေရာမရခဲ့ပါ')
+      );
+    });
+
+    $('#addForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const data = {
+        id: 'my-' + Date.now(),
+        brand_name: $('#fBrand').value,
+        name: $('#fName').value.trim(),
+        branch: '',
+        address_mm: $('#fAddr').value.trim(),
+        township_mm: $('#fTown').value.trim(),
+        phone: $('#fPhone').value.trim(),
+        source: 'Added by user',
+        confidence: 'user-added',
+        lat: fPos ? fPos.lat : undefined,
+        lng: fPos ? fPos.lng : undefined,
+        maps_q: `${$('#fBrand').value} ${$('#fAddr').value.trim()} ${$('#fTown').value.trim()} Mandalay`
+      };
+
+      state.mine.push(data);
+      saveMine();
+      $('#dialog').close();
+      $('#addForm').reset();
+      $('#fGps').textContent = '📍 တည်နေရာယူမည်';
+      toast('ဆိုင်အသစ် ထည့်ပြီးပါပြီ');
+      render();
+    });
+
+    loadData();
+  </script>
 </body>
 </html>
