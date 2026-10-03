@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#D4A574">
   <meta name="description" content="Myanmar convenience store and minimart finder">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>Myanmar Minimart Finder</title>
+  <title>Mandalay Minimart Finder</title>
   <style>
     :root {
       --bg: #fefbf7;
@@ -20,8 +20,6 @@
       --accent-soft: #f9efe3;
       --shadow-sm: 0 1px 2px rgba(45,36,29,.04);
       --shadow: 0 10px 24px rgba(45,36,29,.08);
-      --success: #2d7a5d;
-      --danger: #b5473a;
     }
 
     * { box-sizing: border-box; }
@@ -53,40 +51,6 @@
       font-size: 0.9rem;
       color: var(--text-muted);
       letter-spacing: 0.02em;
-    }
-
-    .city-selector {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 18px;
-      padding: 8px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: rgba(255,255,255,0.7);
-      backdrop-filter: blur(6px);
-      flex-wrap: wrap;
-    }
-    .city-btn {
-      padding: 9px 14px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--surface);
-      cursor: pointer;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--text);
-      transition: all 0.2s ease;
-    }
-    .city-btn:hover {
-      border-color: var(--accent);
-      background: var(--accent-soft);
-      transform: translateY(-1px);
-    }
-    .city-btn.active {
-      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
-      color: white;
-      border-color: transparent;
-      box-shadow: 0 8px 18px rgba(212,162,93,0.28);
     }
 
     .search-box {
@@ -434,18 +398,15 @@
       .search-box { flex-direction: column; }
       .actions { grid-template-columns: 1fr 1fr; }
       dialog { width: 95vw; padding: 16px; }
-      .city-selector { gap: 6px; }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <div class="logo">🏪 Myanmar Minimart</div>
-      <div class="subtitle">CoCo · G&G · Lar Lar · City Mart ရှာဖွေရေး</div>
+      <div class="logo">🏪 Mandalay Minimart</div>
+      <div class="subtitle">လမ်းနာမည်နဲ့ ရှာဖွေပါ</div>
     </header>
-
-    <div class="city-selector" id="citySelector"></div>
 
     <div class="search-box">
       <input id="search" type="search" placeholder="လမ်း / နံပါတ် / မြို့နယ် ရိုက်ပါ" aria-label="Search">
@@ -481,6 +442,8 @@
           <option value="G&G">G&G</option>
           <option value="Lar Lar">Lar Lar</option>
           <option value="City Mart">City Mart</option>
+          <option value="Ocean">Ocean</option>
+          <option value="Capital">Capital</option>
           <option value="Other">အခြား</option>
         </select>
       </div>
@@ -489,11 +452,11 @@
         <input id="fName" type="text" placeholder="CoCo Branch 1" required>
       </div>
       <div class="form-group">
-        <label>လိပ်စာ</label>
+        <label>လိပ်စာ / လမ်းနာမည်</label>
         <input id="fAddr" type="text" placeholder="(84) လမ်း၊ (30x77)" required>
       </div>
       <div class="form-group">
-        <label>မြို့နယ် / ရှပ်</label>
+        <label>မြို့နယ်</label>
         <input id="fTown" type="text" placeholder="ချမ်းအေးသာစံ" required>
       </div>
       <div class="form-group">
@@ -517,16 +480,8 @@
       ['G&G', 'G&G'],
       ['Lar Lar', 'Lar Lar'],
       ['City Mart', 'City Mart'],
-      ['Other', 'အခြား']
-    ];
-
-    const CITIES = [
-      ['Mandalay', 'မန္တလေး'],
-      ['Yangon', 'ရန်ကုန်'],
-      ['Naypyidaw', 'နေပြည်တော်'],
-      ['Bagan', 'ပုဂ္ဂလိက'],
-      ['Taunggyi', 'တောင်ကြီး'],
-      ['All', 'အားလုံး']
+      ['Ocean', 'Ocean'],
+      ['Capital', 'Capital']
     ];
 
     const state = {
@@ -534,7 +489,6 @@
       mine: [],
       brand: 'all',
       town: 'all',
-      city: 'Mandalay',
       query: '',
       favOnly: false,
       pos: null,
@@ -544,30 +498,16 @@
     const $ = (sel) => document.querySelector(sel);
     const $$ = (sel) => [...document.querySelectorAll(sel)];
 
-    function normalizeText(value) {
-      return String(value || '')
-        .toLowerCase()
-        .replace(/[\u200B-\u200D\uFEFF]/g, '')
-        .replace(/[^\p{L}\p{N}\s]/gu, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-    }
-
-    function resolveCity(shop) {
-      const text = [shop.city_mm, shop.state_mm, shop.township_mm, shop.address_mm, shop.name].join(' ');
-      const n = normalizeText(text);
-
-      if (n.includes('yangon') || n.includes('ရန်ကုန်') || n.includes('rangoon')) return 'Yangon';
-      if (n.includes('naypyidaw') || n.includes('နေပြည်တော်')) return 'Naypyidaw';
-      if (n.includes('bagan') || n.includes('ပုဂ္ဂလိက') || n.includes('ဗုဒ္ဓဂယာ')) return 'Bagan';
-      if (n.includes('taunggyi') || n.includes('တောင်ကြီး')) return 'Taunggyi';
-      if (n.includes('mandalay') || n.includes('မန္တလေး')) return 'Mandalay';
-      return 'Mandalay';
-    }
-
-    function cityMatches(shop, cityName) {
-      if (cityName === 'All') return true;
-      return resolveCity(shop) === cityName;
+    function isMandalay(shop) {
+      const text = [shop.city_mm, shop.state_mm, shop.township_mm, shop.address_mm, shop.name].join(' ').toLowerCase();
+      return !text.includes('yangon') && 
+             !text.includes('ရန်ကုန်') && 
+             !text.includes('naypyidaw') && 
+             !text.includes('နေပြည်တော်') && 
+             !text.includes('bagan') && 
+             !text.includes('ပုဂ္ဂလိက') && 
+             !text.includes('taunggyi') && 
+             !text.includes('တောင်ကြီး');
     }
 
     function esc(str) {
@@ -605,7 +545,7 @@
 
     function mapsUrl(shop) {
       if (shop.lat && shop.lng) return `https://www.google.com/maps/search/?api=1&query=${shop.lat},${shop.lng}`;
-      const cityHint = shop.city_mm || shop.township_mm || shop.state_mm || 'Mandalay';
+      const cityHint = shop.city_mm || shop.township_mm || 'မန္တလေး';
       return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.address_mm || shop.name || '')} ${encodeURIComponent(cityHint)}`;
     }
 
@@ -620,7 +560,7 @@
         const hay = norm([s.brand_name, s.name, s.branch, s.address_mm, s.township_mm, s.phone].join(' '));
         return (state.brand === 'all' || s.brand_name === state.brand) &&
                (state.town === 'all' || s.township_mm === state.town) &&
-               cityMatches(s, state.city) &&
+               isMandalay(s) &&
                (!state.favOnly || state.favs.has(s.id)) &&
                q.every(t => hay.includes(t));
       });
@@ -632,10 +572,10 @@
 
       $('#count').textContent = `${rows.length} ဆိုင်`;
 
-      $('#cards').innerHTML = !rows.length ? '<div class="empty"><div class="empty-icon">🔍</div>သည်မည်သည့်အချက်အလက်မျှမတွေ့ပါ</div>'
+      $('#cards').innerHTML = !rows.length ? '<div class="empty"><div class="empty-icon">🔍</div>ရှာလိုတဲ့ ဆိုင်မမတွေ့ပါ</div>'
         : rows.map((s, i) => {
           const isFav = state.favs.has(s.id);
-          const dist = s._d ? `<div class="card-distance">📍 ${s._d.toFixed(1)} km</div>` : '';
+          const distText = s._d ? `<div class="card-distance">📍 ${s._d.toFixed(1)} km</div>` : '';
           return `
             <div class="card">
               <div class="card-header">
@@ -643,12 +583,11 @@
                 <button class="card-badge ${isFav ? 'active' : ''}" data-fav="${esc(s.id)}">★</button>
               </div>
               <div class="card-meta">
-                <span class="meta-tag">${esc(s.township_mm || 'Myanmar')}</span>
-                <span class="meta-tag">${esc(resolveCity(s))}</span>
+                <span class="meta-tag">${esc(s.township_mm || 'မန္တလေး')}</span>
               </div>
               <div class="card-address">${esc(s.address_mm || s.name || 'လိပ်စာမရှိ')}</div>
               ${s.phone ? `<div class="card-phone">☎ <a href="tel:${encodeURIComponent(s.phone)}">${esc(s.phone)}</a></div>` : ''}
-              ${dist}
+              ${distText}
               <div class="card-actions">
                 <a class="card-link" target="_blank" rel="noopener" href="${mapsUrl(s)}">Maps</a>
                 ${s.foodpanda_url ? `<a class="card-link" target="_blank" rel="noopener" href="${s.foodpanda_url}">Food</a>` : ''}
@@ -680,24 +619,10 @@
       `).join('');
       $$('#brands [data-brand]').forEach(b => { b.onclick = () => { state.brand = b.dataset.brand; render(); }; });
 
-      const towns = [...new Set(state.shops.concat(state.mine).filter(s => cityMatches(s, state.city)).map(s => s.township_mm).filter(Boolean))].sort();
+      const towns = [...new Set(state.shops.concat(state.mine).filter(s => isMandalay(s)).map(s => s.township_mm).filter(Boolean))].sort();
       $('#towns').innerHTML = [['all', 'မြို့နယ်အားလုံး'], ...towns.map(t => [t, t])]
         .map(([v, l]) => `<button class="filter-chip ${state.town === v ? 'active' : ''}" data-town="${v}">${esc(l)}</button>`).join('');
       $$('#towns [data-town]').forEach(b => { b.onclick = () => { state.town = b.dataset.town; render(); }; });
-    }
-
-    function renderCities() {
-      $('#citySelector').innerHTML = CITIES.map(([v, l]) => `
-        <button type="button" class="city-btn ${state.city === v ? 'active' : ''}" data-city="${v}">${esc(l)}</button>
-      `).join('');
-      $$('#citySelector [data-city]').forEach(b => {
-        b.onclick = () => {
-          state.city = b.dataset.city;
-          state.town = 'all';
-          renderCities();
-          render();
-        };
-      });
     }
 
     function loadData() {
@@ -707,7 +632,6 @@
           state.shops = d.shops || [];
           state.mine = JSON.parse(localStorage.getItem('mine') || '[]');
           state.favs = new Set(JSON.parse(localStorage.getItem('favs') || '[]'));
-          renderCities();
           render();
         })
         .catch(() => {
@@ -756,7 +680,7 @@
         branch: '',
         address_mm: $('#fAddr').value,
         township_mm: $('#fTown').value,
-        city_mm: state.city,
+        city_mm: 'မန္တလေး',
         phone: $('#fPhone').value,
         lat: fPos?.lat,
         lng: fPos?.lng
